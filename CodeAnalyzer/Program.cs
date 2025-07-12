@@ -37,5 +37,7 @@ class Program
         Analyzer.CheckMethodLengths(methods, lengthTreshold);
         Console.Clear();
         Analyzer.CheckParameterCount(methods);
+        Console.Clear();
+        Analyzer.CheckMagicNumbers(methods);
     }
 }

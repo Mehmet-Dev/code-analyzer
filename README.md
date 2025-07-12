@@ -11,7 +11,7 @@ C# code analyzer.
 |---------------------------|-----------------------------------------------------------|
 | ✅ Method length detection | Warn when a method exceeds N lines                         |
 | ✅ Parameter count check   | Flag methods with too many parameters (e.g., > 4)          |
-| ⬜ Magic number detection  | Find numeric literals that aren’t part of constants        |
+| ✅ Magic number detection  | Find numeric literals that aren’t part of constants        |
 | ⬜ TODO/FIXME comment detector | Warn about unfinished code or dev notes left behind  |
 | ⬜ File-wide stats         | Total lines, number of methods, longest method, etc.       |
 
