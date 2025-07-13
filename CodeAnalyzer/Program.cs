@@ -41,5 +41,7 @@ class Program
         Analyzer.CheckMagicNumbers(methods);
         Console.Clear();
         Analyzer.CheckUnchangedCode(root);
+        Console.Clear();
+        Analyzer.ShowFileStats(root);
     }
 }

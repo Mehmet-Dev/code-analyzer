@@ -7,13 +7,15 @@ C# code analyzer.
 
 ### 🧱 PHASE 1: Core Features (MVP)
 
-| ✅ Feature                 | 🔍 What it does                                           |
-|---------------------------|-----------------------------------------------------------|
-| ✅ Method length detection | Warn when a method exceeds N lines                         |
-| ✅ Parameter count check   | Flag methods with too many parameters (e.g., > 4)          |
-| ✅ Magic number detection  | Find numeric literals that aren’t part of constants        |
-| ✅ TODO/FIXME comment detector | Warn about unfinished code or dev notes left behind  |
-| ⬜ File-wide stats         | Total lines, number of methods, longest method, etc.       |
+| ✅ Feature                     | 🔍 What it does                                               |
+|-------------------------------|---------------------------------------------------------------|
+| ✅ Method length detection     | Warn when a method exceeds N lines                           |
+| ✅ Parameter count check       | Flag methods with too many parameters (e.g., > 4)            |
+| ✅ Magic number detection      | Find numeric literals that aren’t part of constants          |
+| ✅ TODO/FIXME comment detector | Warn about unfinished code or dev notes left behind          |
+| ⬜ File-wide stats             | Total lines, number of methods, longest method, etc.         |
+| ⬜ Codebase restructure        | Organize files, split logic, improve naming and structure     |
+
 
 ---
 
