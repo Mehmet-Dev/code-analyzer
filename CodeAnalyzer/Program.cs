@@ -39,5 +39,7 @@ class Program
         Analyzer.CheckParameterCount(methods);
         Console.Clear();
         Analyzer.CheckMagicNumbers(methods);
+        Console.Clear();
+        Analyzer.CheckUnchangedCode(root);
     }
 }

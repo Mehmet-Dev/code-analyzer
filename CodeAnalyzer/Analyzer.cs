@@ -11,8 +11,6 @@ namespace CodeAnalyzer;
 
 public static class Analyzer
 {
-    private static int _phase = 1;
-
     /// <summary>
     /// Go through each individual method and check how many lines it is
     /// </summary>
@@ -20,7 +18,7 @@ public static class Analyzer
     /// <param name="lengthTreshold">The line treshold</param>
     public static void CheckMethodLengths(IEnumerable<MethodDeclarationSyntax> methods, int lengthTreshold)
     {
-        AnsiConsole.MarkupLine($"[bold yellow]Phase {_phase} - Method Length Report[/]");
+        AnsiConsole.MarkupLine($"[bold yellow]Method Length Report[/]");
 
         foreach (var method in methods)
         {
@@ -38,7 +36,6 @@ public static class Analyzer
         }
 
         ConsoleUI.WaitForKey();
-        _phase++;
     }
 
     /// <summary>
@@ -47,7 +44,7 @@ public static class Analyzer
     /// <param name="methods">An Enumerator of Methods</param>
     public static void CheckParameterCount(IEnumerable<MethodDeclarationSyntax> methods)
     {
-        AnsiConsole.MarkupLine($"[bold yellow]Phase {_phase} - Parameter Count Report[/]");
+        AnsiConsole.MarkupLine($"[bold yellow]Parameter Count Report[/]");
 
         foreach (var method in methods)
         {
@@ -60,7 +57,6 @@ public static class Analyzer
         }
 
         ConsoleUI.WaitForKey();
-        _phase++;
     }
 
     public static void CheckMagicNumbers(IEnumerable<MethodDeclarationSyntax> methods)
@@ -79,7 +75,7 @@ public static class Analyzer
         };
 
         List<int> filterOut = [0, 1];
-        AnsiConsole.MarkupLine($"[bold yellow]Phase {_phase} - Magic Number Detection[/]");
+        AnsiConsole.MarkupLine($"[bold yellow]Magic Number Detection[/]");
 
         foreach (var method in methods)
         {
@@ -117,7 +113,7 @@ public static class Analyzer
                 var lineSpan = numeric.SyntaxTree.GetLineSpan(numeric.Span);
                 int lineNumber = lineSpan.StartLinePosition.Line + 1;
 
-                AnsiConsole.MarkupLine($"[red]- Magic number {numeric.Token.Value} found on line {lineNumber}.[/]");
+                AnsiConsole.MarkupLine($"[red]- Magic number {numeric.Token.Value} found on line {lineNumber}[/]");
                 magicNumberFound = true;
             }
 
@@ -125,6 +121,57 @@ public static class Analyzer
                 AnsiConsole.MarkupLine("[green]- No magic number found[/]");
         }
         AnsiConsole.MarkupLine($"\n[red italic]Always[/][red] remember to use a descriptive constant instead of a magic number.[/]");
+    }
+
+    /// <summary>
+    /// A simple TODO/FIXME-style comment detector.
+    /// It has a general list to filter from.
+    /// It displays at what line the comments are found.
+    /// </summary>
+    /// <param name="root">The root (compilation unit)</param>
+    public static void CheckUnchangedCode(SyntaxNode root)
+    {
+        bool foundAny = false;
+        List<string> todoMarkers = new()
+        {
+            "todo",
+            "fixme",
+            "hack",
+            "xxx",       // often used as a "this needs attention" tag
+            "bug",
+            "note",      // sometimes used for reminders
+            "tbd",       // to be decided
+            "fix",       // shorthand some people use
+            "optimize",  // performance-related TODOs
+            "cleanup"    // used for code refactoring notes
+        };
+
+        var comments = root.DescendantTrivia()
+                        .Where(t => t.IsKind(SyntaxKind.SingleLineCommentTrivia) || t.IsKind(SyntaxKind.MultiLineCommentTrivia));
+
+        AnsiConsole.MarkupLine($"FIXME and TODO comments");
+
+        foreach (SyntaxTrivia comment in comments)
+        {
+            string text = comment.ToString().ToLower();
+
+            string? match = todoMarkers.FirstOrDefault(m =>
+                text.Contains(m, StringComparison.OrdinalIgnoreCase));
+            if (match != null)
+            {
+                foundAny = true;
+                var lineNumber = comment.SyntaxTree.GetLineSpan(comment.Span).StartLinePosition.Line + 1;
+
+                if (text.Trim().Length < 10)
+                    AnsiConsole.MarkupLine($"[yellow]- {match.ToUpper()} on line {lineNumber} is vague, consider adding more detail.[/]");
+                else
+                    AnsiConsole.MarkupLine($"[red]- {match.ToUpper()} found on line {lineNumber}: [/][italic green]{text.Trim()}[/]");
+            }
+        }
+        if (foundAny)
+            AnsiConsole.MarkupLine("\n[blue]It shouldn't be difficult to fix them.[/]");
+        else
+            AnsiConsole.MarkupLine("\nNo TODO/FIXME-style comments found.");
     }
 
     /// <summary>
