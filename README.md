@@ -13,8 +13,8 @@ C# code analyzer.
 | ✅ Parameter count check       | Flag methods with too many parameters (e.g., > 4)            |
 | ✅ Magic number detection      | Find numeric literals that aren’t part of constants          |
 | ✅ TODO/FIXME comment detector | Warn about unfinished code or dev notes left behind          |
-| ⬜ File-wide stats             | Total lines, number of methods, longest method, etc.         |
-| ⬜ Codebase restructure        | Organize files, split logic, improve naming and structure     |
+| ✅ File-wide stats             | Total lines, number of methods, longest method, etc.         |
+| ✅ Codebase restructure        | Organize files, split logic, improve naming and structure     |
 
 
 ---
@@ -33,13 +33,15 @@ C# code analyzer.
 
 ### 📊 PHASE 3: Reporting + CLI Power-Ups
 
-| Feature                   | What it does                                              |
-|---------------------------|-----------------------------------------------------------|
-| ⬜ JSON report output      | Export results to results.json for CI or external tools    |
-| ⬜ Markdown or HTML report | Make nice-looking human-readable reports                   |
-| ⬜ Threshold configuration | User can customize limits (e.g., max lines, param count) via CLI or config file |
-| ⬜ File globbing           | Analyze entire folders with *.cs pattern                    |
-| ⬜ Summary table with Spectre.Console | Show results in table format with colors (very cool looking) |
+| Feature                              | What it does                                                                    |
+| ------------------------------------ | ------------------------------------------------------------------------------- |
+| ⬜ JSON report output                 | Export results to `results.json` for CI or external tools                       |
+| ⬜ Markdown or HTML report            | Make nice-looking human-readable reports                                        |
+| ⬜ Threshold configuration            | User can customize limits (e.g., max lines, param count) via CLI or config file |
+| ⬜ File globbing                      | Analyze entire folders with `*.cs` pattern                                      |
+| ⬜ Summary table with Spectre.Console | Show results in table format with colors (very cool looking)                    |
+| ⬜ CLI flag-based check selection     | Run only specific checks via CLI flags (e.g., `--magic`, `--params`, etc.)      |
+
 
 ---
 

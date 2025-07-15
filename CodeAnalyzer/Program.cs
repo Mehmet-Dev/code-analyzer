@@ -1,5 +1,7 @@
 ﻿using CodeAnalyzer.Helpers.UserInfo;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Spectre.Console;
 
 namespace CodeAnalyzer;
 
@@ -31,17 +33,28 @@ class Program
             _ => 20
         };
 
-        var root = Analyzer.ReturnRoot(filePath);
-        IEnumerable<MethodDeclarationSyntax> methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
+        SyntaxNode root = null!;
 
-        Analyzer.CheckMethodLengths(methods, lengthTreshold);
+        try
+        {
+            root = Analyzer.ReturnRoot(filePath);
+        }
+        catch (InvalidDataException e)
+        {
+            AnsiConsole.MarkupLine($"[bold red]{e.Message}[/]");
+            Environment.Exit(1);
+        }
+
+        Analyzer analyzer = new(root);
+
+        analyzer.CheckMethodLengths(lengthTreshold);
         Console.Clear();
-        Analyzer.CheckParameterCount(methods);
+        analyzer.CheckParameterCount();
         Console.Clear();
-        Analyzer.CheckMagicNumbers(methods);
+        analyzer.CheckMagicNumbers();
         Console.Clear();
-        Analyzer.CheckUnchangedCode(root);
+        analyzer.CheckPendingTasks();
         Console.Clear();
-        Analyzer.ShowFileStats(root);
+        analyzer.ShowFileStats();
     }
 }
