@@ -56,5 +56,7 @@ class Program
         analyzer.CheckPendingTasks();
         Console.Clear();
         analyzer.ShowFileStats();
+        Console.Clear();
+        analyzer.CheckMethodComplexity();
     }
 }

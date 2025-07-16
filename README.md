@@ -23,7 +23,7 @@ C# code analyzer.
 
 | Feature                    | What it adds                                              |
 |----------------------------|-----------------------------------------------------------|
-| ⬜ Cyclomatic complexity estimator | Count decision points (if, switch, for, while) to show complexity |
+| ✅ Cyclomatic complexity estimator | Count decision points (if, switch, for, while) to show complexity |
 | ⬜ Dead code detector (basic) | Warn if you detect code that never runs (e.g., after a return)  |
 | ⬜ Duplicate string literals | Warn about repeated string literals that should be extracted |
 | ⬜ Nested loop depth warning | Flag deeply nested loops (e.g., 3+ levels)                |

@@ -84,9 +84,9 @@ public class Analyzer
     public void CheckPendingTasks()
     {
         List<string> comments = PendingTasksAnalyzer.CheckPendingTasks(_root);
-        AnsiConsole.MarkupLine($"FIXME and TODO comments");
+        AnsiConsole.MarkupLine($"[bold yellow]FIXME and TODO comments[/]");
 
-        if (comments.Count() == 0)
+        if (comments.Count == 0)
         {
             AnsiConsole.MarkupLine("No TODO/FIXME-style comments found.");
         }
@@ -97,6 +97,18 @@ public class Analyzer
         }
 
         ConsoleUI.WaitForKey();
+    }
+
+    public void CheckMethodComplexity()
+    {
+        List<string> lines = ComplexityAnalyzer.CalculateComplexity(_root);
+
+        AnsiConsole.MarkupLine($"[bold yellow]Method complexity[/]");
+
+        foreach (string line in lines)
+        {
+            AnsiConsole.MarkupLine(line);
+        }
     }
 
     public void ShowFileStats()
