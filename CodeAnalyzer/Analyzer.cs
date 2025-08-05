@@ -61,6 +61,10 @@ public class Analyzer
         ConsoleUI.WaitForKey();
     }
 
+    /// <summary>
+    /// Check for magic numbers.
+    /// Magic numbers are number literals that aren't assigned to values.
+    /// </summary>
     public void CheckMagicNumbers()
     {
         var magicNumbers = MagicNumberAnalyzer.CheckMagicNumbers(_root);
@@ -99,6 +103,11 @@ public class Analyzer
         ConsoleUI.WaitForKey();
     }
 
+    /// <summary>
+    /// Check how complex your methods are.
+    /// It checks for decision points (if, foreach, etc.)
+    /// And uses an arbitrary value to determine how complex a method is.
+    /// </summary>
     public void CheckMethodComplexity()
     {
         List<string> lines = ComplexityAnalyzer.CalculateComplexity(_root);
@@ -109,8 +118,12 @@ public class Analyzer
         {
             AnsiConsole.MarkupLine(line);
         }
+        ConsoleUI.WaitForKey();
     }
 
+    /// <summary>
+    /// Shows general file stats like total lines, amount of methods, etc.
+    /// </summary>
     public void ShowFileStats()
     {
         List<string> writes = FileAnalyzer.ShowFileStats(_root);
@@ -118,6 +131,33 @@ public class Analyzer
         foreach (string write in writes)
         {
             AnsiConsole.MarkupLine(write);
+        }
+
+        ConsoleUI.WaitForKey();
+    }
+
+    /// <summary>
+    /// Display dead code information
+    /// </summary>
+    public void CheckDeadCode()
+    {
+        Dictionary<string, List<string>> methodWarnings = DeadCodeAnalyzer.DetermineDeadCode(_root);
+        AnsiConsole.MarkupLine($"[bold yellow]Dead code detection[/]");
+
+        if (methodWarnings.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[green]No dead code detected![/]");
+            return;
+        }
+
+        foreach (var (method, warnings) in methodWarnings)
+        {
+            AnsiConsole.MarkupLine($"[blue]{method}[/]");
+
+            foreach (string warning in warnings)
+            {
+                AnsiConsole.MarkupLine($"[red]- {warning}[/]");
+            }
         }
 
         ConsoleUI.WaitForKey();

@@ -58,5 +58,7 @@ class Program
         analyzer.ShowFileStats();
         Console.Clear();
         analyzer.CheckMethodComplexity();
+        Console.Clear();
+        analyzer.CheckDeadCode();
     }
 }
