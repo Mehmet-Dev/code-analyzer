@@ -62,5 +62,8 @@ class Program
         analyzer.CheckDeadCode();
         Console.Clear();
         analyzer.FindDuplicateStrings();
+        Console.Clear();
+        analyzer.CheckMethodDepth();
+        Console.Clear();
     }
 }

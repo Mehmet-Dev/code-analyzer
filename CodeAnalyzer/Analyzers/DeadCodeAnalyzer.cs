@@ -23,7 +23,7 @@ public static class DeadCodeAnalyzer
 
             List<string> warnings = new();
 
-            AnalyzeBlock(method.Body, warnings); // Check every statement of the method
+            AnalyzeBlock(body, warnings); // Check every statement of the method
 
             if (warnings.Any())
             {

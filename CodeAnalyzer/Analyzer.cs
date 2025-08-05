@@ -178,6 +178,7 @@ public class Analyzer
         if (strings.Count == 0)
         {
             AnsiConsole.MarkupLine("[green]No duplicate string literals found![/]");
+            ConsoleUI.WaitForKey();
             return;
         }
 
@@ -187,6 +188,27 @@ public class Analyzer
         }
 
         AnsiConsole.MarkupLine("\n[yellow]Consider using constant string variables if you're using them multiple times[/]");
+        ConsoleUI.WaitForKey();
+    }
+
+    public void CheckMethodDepth()
+    {
+        var results = NestedLoopAnalyzer.Analyze(_root);
+
+        AnsiConsole.MarkupLine($"[bold yellow]Methods with deeply nested loops[/]");
+
+        if (results.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[green]No methods found with deeply nested loops![/]");
+            return;
+        }
+
+        foreach (var (methodName, amount) in results)
+        {
+            AnsiConsole.MarkupLine($"[blue]{methodName}[/] has a depth of [red]{amount}[/]");
+        }
+
+        AnsiConsole.MarkupLine("[yellow]Consider refactoring these methods so they aren't too deeply nested[/]");
         ConsoleUI.WaitForKey();
     }
 
