@@ -169,7 +169,7 @@ public class Analyzer
     /// and that are repeated multiple times.
     /// It's better to assign them to values.
     /// </summary>
-    public void FindDuplicateStrings()
+    public void CheckDuplicateStrings()
     {
         var strings = DuplicateStringAnalyzer.Analyze(_root);
 
@@ -208,9 +208,36 @@ public class Analyzer
             AnsiConsole.MarkupLine($"[blue]{methodName}[/] has a depth of [red]{amount}[/]");
         }
 
-        AnsiConsole.MarkupLine("[yellow]Consider refactoring these methods so they aren't too deeply nested[/]");
+        AnsiConsole.MarkupLine("\n[yellow]Consider refactoring these methods so they aren't too deeply nested[/]");
         ConsoleUI.WaitForKey();
     }
+
+    /// <summary>
+    /// Check method names for generic names.
+    /// Generic names are VERY BAD!!!!!!!!!!!!!!!
+    /// </summary>
+    public void CheckMethodNames()
+    {
+        List<string> methods = MethodNameAnalyzer.Analyze(_root);
+
+        AnsiConsole.MarkupLine("[bold yellow]Method name analyzer[/]");
+
+        if (methods.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[green]No generic method names found![/]");
+            ConsoleUI.WaitForKey();
+            return;
+        }
+
+        foreach (string method in methods)
+        {
+            AnsiConsole.MarkupLine($"[blue]Method name [red]\"{method}\"[/] is too generic[/]");
+        }
+
+        AnsiConsole.MarkupLine($"\n[yellow]It's not good practice to use method names that don't explain what they're supposed to do[/]");
+        ConsoleUI.WaitForKey();
+    }
+
 
     /// <summary>
     /// Get the root of the SyntaxTree
