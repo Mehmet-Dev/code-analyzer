@@ -6,7 +6,7 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class FileAnalyzer
 {
-    public static List<string> ShowFileStats(SyntaxNode root)
+    public static List<string> Analyze(SyntaxNode root)
     {
         SyntaxTree tree = root.SyntaxTree;
         List<string> writes = new();
@@ -25,7 +25,7 @@ public static class FileAnalyzer
         int amountOfClasses = root.DescendantNodes().OfType<ClassDeclarationSyntax>().Count();
 
         // Part 5: Number of TODO/FIXME comments
-        int amountOfPendingTasks = PendingTasksAnalyzer.CheckPendingTasks(root).Count();
+        int amountOfPendingTasks = PendingTasksAnalyzer.Analyze(root).Count();
 
         // Part 6: Number of properties/fields
         var (properties, fields) = GetAmountOfPropertiesAndFields(root);

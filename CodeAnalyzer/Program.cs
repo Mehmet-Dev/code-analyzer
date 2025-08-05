@@ -60,5 +60,7 @@ class Program
         analyzer.CheckMethodComplexity();
         Console.Clear();
         analyzer.CheckDeadCode();
+        Console.Clear();
+        analyzer.FindDuplicateStrings();
     }
 }

@@ -5,7 +5,7 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class PendingTasksAnalyzer
 {
-    public static List<string> CheckPendingTasks(SyntaxNode root)
+    public static List<string> Analyze(SyntaxNode root)
     {
         List<string> tasks = new();
         List<string> todoMarkers = new()

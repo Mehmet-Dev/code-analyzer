@@ -5,7 +5,7 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class ParameterCountAnalzer
 {
-    public static Dictionary<(string name, int count), (string message, string color)> CheckParameterCount(SyntaxNode root)
+    public static Dictionary<(string name, int count), (string message, string color)> Analyze(SyntaxNode root)
     {
         Dictionary<(string name, int count), (string message, string color)> list = new();
         IEnumerable<MethodDeclarationSyntax> methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();

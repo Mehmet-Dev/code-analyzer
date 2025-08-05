@@ -6,7 +6,7 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class ComplexityAnalyzer
 {
-    public static List<string> CalculateComplexity(SyntaxNode root)
+    public static List<string> Analyze(SyntaxNode root)
     {
         List<string> linesToPrint = new();
 

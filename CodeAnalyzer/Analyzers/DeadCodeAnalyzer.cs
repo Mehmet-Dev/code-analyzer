@@ -11,7 +11,7 @@ public static class DeadCodeAnalyzer
     /// </summary>
     /// <param name="root">Root syntax node</param>
     /// <returns>A dictionary where the key is the method name and the value is a list of warnings</returns>
-    public static Dictionary<string, List<string>> DetermineDeadCode(SyntaxNode root)
+    public static Dictionary<string, List<string>> Analyze(SyntaxNode root)
     {
         Dictionary<string, List<string>> methodWarnings = new();
         IEnumerable<MethodDeclarationSyntax> methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();

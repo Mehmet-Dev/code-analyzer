@@ -48,7 +48,7 @@ public class Analyzer
     {
         AnsiConsole.MarkupLine($"[bold yellow]Parameter Count Report[/]");
 
-        var parameterCounts = ParameterCountAnalzer.CheckParameterCount(_root);
+        var parameterCounts = ParameterCountAnalzer.Analyze(_root);
 
         foreach (var counts in parameterCounts)
         {
@@ -67,7 +67,7 @@ public class Analyzer
     /// </summary>
     public void CheckMagicNumbers()
     {
-        var magicNumbers = MagicNumberAnalyzer.CheckMagicNumbers(_root);
+        var magicNumbers = MagicNumberAnalyzer.Analyze(_root);
         AnsiConsole.MarkupLine($"[bold yellow]Magic Number Detection[/]");
 
         foreach (var (name, message) in magicNumbers)
@@ -87,7 +87,7 @@ public class Analyzer
     /// <param name="root">The root (compilation unit)</param>
     public void CheckPendingTasks()
     {
-        List<string> comments = PendingTasksAnalyzer.CheckPendingTasks(_root);
+        List<string> comments = PendingTasksAnalyzer.Analyze(_root);
         AnsiConsole.MarkupLine($"[bold yellow]FIXME and TODO comments[/]");
 
         if (comments.Count == 0)
@@ -110,7 +110,7 @@ public class Analyzer
     /// </summary>
     public void CheckMethodComplexity()
     {
-        List<string> lines = ComplexityAnalyzer.CalculateComplexity(_root);
+        List<string> lines = ComplexityAnalyzer.Analyze(_root);
 
         AnsiConsole.MarkupLine($"[bold yellow]Method complexity[/]");
 
@@ -126,7 +126,7 @@ public class Analyzer
     /// </summary>
     public void ShowFileStats()
     {
-        List<string> writes = FileAnalyzer.ShowFileStats(_root);
+        List<string> writes = FileAnalyzer.Analyze(_root);
 
         foreach (string write in writes)
         {
@@ -141,7 +141,7 @@ public class Analyzer
     /// </summary>
     public void CheckDeadCode()
     {
-        Dictionary<string, List<string>> methodWarnings = DeadCodeAnalyzer.DetermineDeadCode(_root);
+        Dictionary<string, List<string>> methodWarnings = DeadCodeAnalyzer.Analyze(_root);
         AnsiConsole.MarkupLine($"[bold yellow]Dead code detection[/]");
 
         if (methodWarnings.Count == 0)
@@ -160,6 +160,33 @@ public class Analyzer
             }
         }
 
+        ConsoleUI.WaitForKey();
+    }
+
+    /// <summary>
+    /// Check for duplicate string literals.
+    /// Duplicate string literals are strings that aren't assigned to a variable,
+    /// and that are repeated multiple times.
+    /// It's better to assign them to values.
+    /// </summary>
+    public void FindDuplicateStrings()
+    {
+        var strings = DuplicateStringAnalyzer.Analyze(_root);
+
+        AnsiConsole.MarkupLine($"[bold yellow]Duplicate string literals[/]");
+
+        if (strings.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[green]No duplicate string literals found![/]");
+            return;
+        }
+
+        foreach (var (text, amount) in strings)
+        {
+            AnsiConsole.MarkupLine($"[blue]\"{text}\"[/] is used [red]{amount}[/] times");
+        }
+
+        AnsiConsole.MarkupLine("\n[yellow]Consider using constant string variables if you're using them multiple times[/]");
         ConsoleUI.WaitForKey();
     }
 

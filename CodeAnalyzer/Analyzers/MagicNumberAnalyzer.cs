@@ -6,7 +6,7 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class MagicNumberAnalyzer
 {
-    public static Dictionary<string, string> CheckMagicNumbers(SyntaxNode root)
+    public static Dictionary<string, string> Analyze(SyntaxNode root)
     {
         Dictionary<string, string> magicNumbers = new();
         HashSet<SyntaxKind> kindsToIgnore = new()
