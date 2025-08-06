@@ -9,4 +9,7 @@ public static class ConsoleUI
         AnsiConsole.MarkupLine($"[grey]{message}[/]");
         Console.ReadKey(true);
     }
+
+    public static void PrintError(string message)
+        => AnsiConsole.MarkupLine($"[bold red]{message}[/]");
 }

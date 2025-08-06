@@ -62,7 +62,7 @@ public static class MagicNumberAnalyzer
                 var lineSpan = numeric.SyntaxTree.GetLineSpan(numeric.Span);
                 int lineNumber = lineSpan.StartLinePosition.Line + 1;
 
-                message += $"[red]- Magic number {numeric.Token.Value} found on line {lineNumber}[/]";
+                message += $"[red]- Magic number {numeric.Token.Value} found on line {lineNumber}\n[/]";
                 magicNumberFound = true;
             }
 

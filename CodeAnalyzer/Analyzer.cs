@@ -19,7 +19,7 @@ public class Analyzer
     /// </summary>
     /// <param name="methods">An Enumerator of MethodDeclarationSyntax (methods)</param>
     /// <param name="lengthTreshold">The line treshold</param>
-    public void CheckMethodLengths(int lengthTreshold)
+    public void CheckMethodLengths(int lengthTreshold = 10)
     {
         AnsiConsole.MarkupLine($"[bold yellow]Method Length Report[/]");
 
@@ -73,7 +73,7 @@ public class Analyzer
         foreach (var (name, message) in magicNumbers)
         {
             AnsiConsole.MarkupLine($"[italic blue]{name}[/]");
-            AnsiConsole.MarkupLine(message);
+            AnsiConsole.MarkupLine($"{message}");
         }
         AnsiConsole.MarkupLine($"\n[red italic]Always[/][red] remember to use a descriptive constant instead of a magic number.[/]");
         ConsoleUI.WaitForKey();
