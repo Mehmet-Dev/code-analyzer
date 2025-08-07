@@ -36,7 +36,7 @@ C# code analyzer.
 | ✅ Feature                       | 💡 Description                                                                             |
 | ------------------------------- | ------------------------------------------------------------------------------------------ |
 | ✅ `--check-selection` (CLI flags) | Run only specific checks via CLI flags (e.g., `--deadcode`, `--params`, `--strings`, etc.) |
-| ⬜ Threshold configuration         | Customize analyzer limits (e.g., max lines, parameter count, loop depth) via CLI or config |
+| ✅ Threshold configuration         | Customize analyzer limits (e.g., max lines, parameter count, loop depth) via CLI or config |
 | ⬜ File globbing                   | Analyze multiple files with patterns like `src/**/*.cs`                                    |
 | ⬜ Spectre.Console summary table   | Display a colorful table summary in the terminal — quick visual insight                    |
 | ⬜ JSON report output              | Generate structured results (machine-readable) for CI pipelines or automation              |
@@ -50,7 +50,7 @@ C# code analyzer.
 
 | Feature                   | What it does                                              |
 |---------------------------|-----------------------------------------------------------|
-| ⬜ Roslyn Diagnostic integration | Turn your analyzer into a real Roslyn Analyzer that plugs into Visual Studio |
+| ⬜ Visual Studio Code extension | Turn your analyzer into a real analyzer by downloading an extension on VSC |
 | ⬜ Symbol analysis         | Find unused variables, fields, or methods                  |
 | ⬜ Basic type inference warnings | Detect redundant type declarations (e.g., int x = 5; vs var x = 5;) |
 | ⬜ GitHub Actions integration | Runs analyzer on PRs and shows comments or fails builds  |

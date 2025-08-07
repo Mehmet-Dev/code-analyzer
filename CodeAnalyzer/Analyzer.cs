@@ -19,7 +19,7 @@ public class Analyzer
     /// </summary>
     /// <param name="methods">An Enumerator of MethodDeclarationSyntax (methods)</param>
     /// <param name="lengthTreshold">The line treshold</param>
-    public void CheckMethodLengths(int lengthTreshold = 10)
+    public void CheckMethodLengths(int lengthTreshold)
     {
         AnsiConsole.MarkupLine($"[bold yellow]Method Length Report[/]");
 
@@ -191,9 +191,9 @@ public class Analyzer
         ConsoleUI.WaitForKey();
     }
 
-    public void CheckMethodDepth()
+    public void CheckMethodDepth(int threshold)
     {
-        var results = NestedLoopAnalyzer.Analyze(_root);
+        var results = NestedLoopAnalyzer.Analyze(_root, threshold);
 
         AnsiConsole.MarkupLine($"[bold yellow]Methods with deeply nested loops[/]");
 

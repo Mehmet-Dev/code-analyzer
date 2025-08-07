@@ -1,15 +1,17 @@
 using Microsoft.CodeAnalysis;
-using CodeAnalyzer.Helpers;
 using Spectre.Console;
 using CodeAnalyzer.Helpers.ConsoleUI;
+using System.Text.Json.Nodes;
+using Newtonsoft.Json;
+using CodeAnalyzer.Models;
 
 namespace CodeAnalyzer;
 
 public class AnalyzerCore
 {
     private Analyzer _analyzer;
-    private Dictionary<string, Action> _flags;
-    private Queue<Action> _queue = new();
+    private Dictionary<string, Action<ThresholdContext>> _flags;
+    private Queue<Action<ThresholdContext>> _queue = new();
     private string[] _args;
 
     public AnalyzerCore(string[] args)
@@ -86,9 +88,15 @@ public class AnalyzerCore
     {
         Console.Clear();
 
-        foreach (Action action in _queue)
+        if (!File.Exists("config.cfg")) // If the file doesn't exist, quickly make the file 
+            CreateConfig();
+
+        ThresholdContext context = ParseConfig();
+        
+
+        foreach (var action in _queue)
         {
-            action.Invoke();
+            action.Invoke(context);
             Console.Clear();
         }
     }
@@ -141,20 +149,49 @@ public class AnalyzerCore
         return null;
     }
 
-    private Dictionary<string, Action> RegisterFlags()
+    private Dictionary<string, Action<ThresholdContext>> RegisterFlags()
     => new()
     {
-        ["--methodLength"] = () => _analyzer.CheckMethodLengths(),
-        ["--params"] = () => _analyzer.CheckParameterCount(),
-        ["--magic"] = () => _analyzer.CheckMagicNumbers(),
-        ["--pending"] = () => _analyzer.CheckPendingTasks(),
-        ["--fileStats"] = () => _analyzer.ShowFileStats(),
-        ["--methodComplexity"] = () => _analyzer.CheckMethodComplexity(),
-        ["--deadCode"] = () => _analyzer.CheckDeadCode(),
-        ["--duplicate"] = () => _analyzer.CheckDuplicateStrings(),
-        ["--methodDepth"] = () => _analyzer.CheckMethodDepth(),
-        ["--genericNames"] = () => _analyzer.CheckMethodNames(),
+        ["--methodLength"] = ctx => _analyzer.CheckMethodLengths(ctx.MethodLength),
+        ["--params"] = _ => _analyzer.CheckParameterCount(),
+        ["--magic"] = _ => _analyzer.CheckMagicNumbers(),
+        ["--pending"] = _ => _analyzer.CheckPendingTasks(),
+        ["--fileStats"] = _ => _analyzer.ShowFileStats(),
+        ["--methodComplexity"] = ctx => _analyzer.CheckMethodComplexity(),
+        ["--deadCode"] = _ => _analyzer.CheckDeadCode(),
+        ["--duplicate"] = _ => _analyzer.CheckDuplicateStrings(),
+        ["--methodDepth"] = ctx => _analyzer.CheckMethodDepth(ctx.MethodDepth),
+        ["--genericNames"] = _ => _analyzer.CheckMethodNames(),
     };
+
+
+    private void CreateConfig()
+    {
+        string[] lines = ["MethodLength=15", "MethodDepth=3"];
+        string path = "config.cfg";
+
+        using StreamWriter writer = new(path);
+        foreach (string line in lines)
+            writer.WriteLine(line);
+    }
+
+    private static ThresholdContext ParseConfig()
+    {
+        var lines = File.ReadAllLines("config.cfg");
+        var thresholds = new Dictionary<string, int>();
+
+        foreach (var line in lines)
+        {
+            if (string.IsNullOrEmpty(line) || line.StartsWith("#"))
+                continue;
+
+            var parts = line.Split('=');
+            if (parts.Length == 2 && int.TryParse(parts[1], out int value))
+                thresholds[parts[0]] = value;
+        }
+
+        return new(thresholds["MethodLength"], thresholds["MethodDepth"]);
+    }
 
     private void PrintOutInstructions()
     {

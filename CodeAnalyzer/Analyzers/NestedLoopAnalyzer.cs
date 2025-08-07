@@ -6,7 +6,7 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class NestedLoopAnalyzer
 {
-    public static Dictionary<string, int> Analyze(SyntaxNode root)
+    public static Dictionary<string, int> Analyze(SyntaxNode root, int threshold)
     {
         var results = new Dictionary<string, int>();
         var methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
@@ -16,7 +16,7 @@ public static class NestedLoopAnalyzer
             if (method.Body != null)
             {
                 int depth = AnalyzeBlock(method.Body, 0);
-                if (depth > 1)
+                if (depth > threshold)
                 {
                     results[method.Identifier.Text] = depth;
                 }
