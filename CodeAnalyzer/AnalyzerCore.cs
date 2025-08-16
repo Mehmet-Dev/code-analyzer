@@ -1,8 +1,6 @@
 using Microsoft.CodeAnalysis;
 using Spectre.Console;
 using CodeAnalyzer.Helpers.ConsoleUI;
-using System.Text.Json.Nodes;
-using Newtonsoft.Json;
 using CodeAnalyzer.Models;
 
 namespace CodeAnalyzer;
@@ -32,25 +30,31 @@ public class AnalyzerCore
             Environment.Exit(1);
         }
 
-        foreach (string arg in _args)
+        if (_args.Contains("--bulk"))
         {
-            if (arg.StartsWith("--"))
-            {
-                runAll = false;
-                chosenFlags.Add(arg);
-                continue;
-            }
-            else if (arg.EndsWith(".cs"))
-            {
-                SyntaxNode? root = CheckRoot(arg);
+            BulkAnalyzer bulk = new(_args);
+            Environment.Exit(1);
+        }
 
-                if (root != null)
+        foreach (string arg in _args)
+            {
+                if (arg.StartsWith("--"))
                 {
-                    foundRoot = true;
-                    _analyzer = new(root);
+                    runAll = false;
+                    chosenFlags.Add(arg);
+                    continue;
+                }
+                else if (arg.EndsWith(".cs"))
+                {
+                    SyntaxNode? root = CheckRoot(arg);
+
+                    if (root != null)
+                    {
+                        foundRoot = true;
+                        _analyzer = new(root);
+                    }
                 }
             }
-        }
 
         if (!foundRoot)
         {
@@ -165,7 +169,7 @@ public class AnalyzerCore
     };
 
 
-    private void CreateConfig()
+    public static void CreateConfig()
     {
         string[] lines = ["MethodLength=15", "MethodDepth=3"];
         string path = "config.cfg";
@@ -175,7 +179,7 @@ public class AnalyzerCore
             writer.WriteLine(line);
     }
 
-    private static ThresholdContext ParseConfig()
+    public static ThresholdContext ParseConfig()
     {
         var lines = File.ReadAllLines("config.cfg");
         var thresholds = new Dictionary<string, int>();

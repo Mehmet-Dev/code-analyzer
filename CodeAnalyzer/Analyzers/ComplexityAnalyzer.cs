@@ -74,6 +74,23 @@ public static class ComplexityAnalyzer
         return linesToPrint;
     }
 
+    public static int CheckFileComplexity(SyntaxNode root)
+    {
+        IEnumerable<MethodDeclarationSyntax> methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
+        int complexity = 1;
+
+        foreach (MethodDeclarationSyntax method in methods)
+        {
+            complexity += CalculateIfStatements(method)
+                        + CalculateForAndForeach(method)
+                        + CalculateLogicOperators(method)
+                        + CalculateSwitchBlocks(method)
+                        + CalculateWhileAndDoStatements(method);
+        }
+
+        return complexity;
+    }
+
     private static int CalculateIfStatements(MethodDeclarationSyntax method)
         => method.DescendantNodes().OfType<IfStatementSyntax>().Count();
 

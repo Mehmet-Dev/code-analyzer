@@ -12,3 +12,4 @@ obj/
 .vscode/
 
 TestFile.cs
+test/

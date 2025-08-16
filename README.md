@@ -37,7 +37,7 @@ C# code analyzer.
 | ------------------------------- | ------------------------------------------------------------------------------------------ |
 | ✅ `--check-selection` (CLI flags) | Run only specific checks via CLI flags (e.g., `--deadcode`, `--params`, `--strings`, etc.) |
 | ✅ Threshold configuration         | Customize analyzer limits (e.g., max lines, parameter count, loop depth) via CLI or config |
-| ⬜ File globbing                   | Analyze multiple files with patterns like `src/**/*.cs`                                    |
+| ✅ File globbing                   | Analyze multiple files with patterns like `src/**/*.cs`                                    |
 | ⬜ Spectre.Console summary table   | Display a colorful table summary in the terminal — quick visual insight                    |
 | ⬜ JSON report output              | Generate structured results (machine-readable) for CI pipelines or automation              |
 | ⬜ Markdown / HTML report          | Export readable reports for humans — great for documentation, code reviews, etc.           |
