@@ -175,7 +175,8 @@ public class BulkAnalyzer
         foreach (var path in _files)
         {
             SyntaxNode root = Analyzer.ReturnRoot(path);
-            var result = MagicNumberAnalyzer.Analyze(root);
+            var full = MagicNumberAnalyzer.Analyze(root);
+            var result = full.full;
 
             foreach (var kvp in result)
             {
@@ -203,7 +204,8 @@ public class BulkAnalyzer
 
         foreach (var path in _files)
         {
-            var result = PendingTasksAnalyzer.Analyze(Analyzer.ReturnRoot(path));
+            var full = PendingTasksAnalyzer.Analyze(Analyzer.ReturnRoot(path));
+            var result = full.full;
 
             foreach (var item in result)
                 results.Add(item);

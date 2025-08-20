@@ -1,3 +1,4 @@
+using CodeAnalyzer.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -6,32 +7,40 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class FileAnalyzer
 {
-    public static List<string> Analyze(SyntaxNode root)
+    public static (FileStats fileStats, List<string> lines) Analyze(SyntaxNode root)
     {
         SyntaxTree tree = root.SyntaxTree;
         List<string> writes = new();
+        FileStats stats = new();
 
         // Part 1: file line count
         int fullLength = tree.GetLineSpan(root.Span).EndLinePosition.Line + 1;
+        stats.FullLength = fullLength;
 
         //Part 2: Number of methods
         IEnumerable<MethodDeclarationSyntax> methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
         int amountOfMethods = methods.Count();
+        stats.AmountOfMethods = amountOfMethods;
 
         // Part 3: Longest method by line count & average method length
         var (methodName, lineCount, average) = GetLongestMethodAndAverageMethodLength(methods);
+        stats.MethodStats = (methodName, lineCount, average);
 
         // Part 4: Number of classes
         int amountOfClasses = root.DescendantNodes().OfType<ClassDeclarationSyntax>().Count();
+        stats.AmountOfClasses = amountOfClasses;
 
         // Part 5: Number of TODO/FIXME comments
-        int amountOfPendingTasks = PendingTasksAnalyzer.Analyze(root).Count();
+        int amountOfPendingTasks = PendingTasksAnalyzer.Analyze(root).full.Count();
+        stats.AmountOfPendingTasks = amountOfPendingTasks;
 
         // Part 6: Number of properties/fields
         var (properties, fields) = GetAmountOfPropertiesAndFields(root);
+        stats.FieldsAndProperties = (properties, fields);
 
         // Part 7: Calculate comment density
         double density = CalculateCommentDensity(root);
+        stats.CommentDensity = density;
 
         writes.Add("[bold yellow]File wide stats[/]");
         writes.Add($"[green]Total lines:[/] {fullLength}");
@@ -44,7 +53,7 @@ public static class FileAnalyzer
         writes.Add($"[green]Fields count:[/] {fields}");
         writes.Add($"[green]Comment density:[/] {density:F2}%");
 
-        return writes;
+        return (stats, writes);
     }
 
     /// <summary>

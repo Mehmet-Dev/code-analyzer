@@ -5,9 +5,10 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class PendingTasksAnalyzer
 {
-    public static List<string> Analyze(SyntaxNode root)
+    public static (List<string> raw, List<string> full) Analyze(SyntaxNode root)
     {
         List<string> tasks = new();
+        List<string> rawTasks = new();
         List<string> todoMarkers = new()
         {
             "todo",
@@ -36,12 +37,20 @@ public static class PendingTasksAnalyzer
                 var lineNumber = comment.SyntaxTree.GetLineSpan(comment.Span).StartLinePosition.Line + 1;
 
                 if (text.Trim().Length < 10)
+                {
                     tasks.Add($"[yellow]- {match.ToUpper()} on line {lineNumber} is vague, consider adding more detail.[/]");
+                    rawTasks.Add($"{match.ToUpper()} on line {lineNumber} is vague, add more detail.");
+                }
+
                 else
+                {
                     tasks.Add($"[red]- {match.ToUpper()} found on line {lineNumber}: [/][italic green]{text.Trim()}[/]");
+                    rawTasks.Add($"{match.ToUpper()} found on line {lineNumber}");
+                }
+                    
             }
         }
 
-        return tasks;
+        return (rawTasks, tasks);
     }
 }

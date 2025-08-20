@@ -1,5 +1,6 @@
 using CodeAnalyzer.Analyzers;
 using CodeAnalyzer.Helpers.ConsoleUI;
+using CodeAnalyzer.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -10,9 +11,17 @@ namespace CodeAnalyzer;
 public class Analyzer
 {
     private SyntaxNode _root;
+    public JsonWriter writer;
 
-    public Analyzer(SyntaxNode root)
-        => _root = root;
+    public Analyzer(SyntaxNode root, bool json = false)
+    {
+        _root = root;
+
+        if (json)
+        {
+            writer = new(ReturnAllMethods(_root));
+        }
+    }
 
     /// <summary>
     /// Go through each individual method and check how many lines it is
@@ -35,7 +44,11 @@ public class Analyzer
             {
                 AnsiConsole.MarkupLine($"[green]{name}[/] is {lineCount} lines long.");
             }
+
+            writer?.UpdateLineLength(name, lineCount);
         }
+
+        
 
         ConsoleUI.WaitForKey();
     }
@@ -56,6 +69,8 @@ public class Analyzer
             var (message, color) = counts.Value;
 
             AnsiConsole.MarkupLine($"[{color}]{name} has {count} parameters. {message}[/]");
+
+            writer?.UpdateParameterCount(name, count);
         }
 
         ConsoleUI.WaitForKey();
@@ -67,13 +82,26 @@ public class Analyzer
     /// </summary>
     public void CheckMagicNumbers()
     {
-        var magicNumbers = MagicNumberAnalyzer.Analyze(_root);
+        var full = MagicNumberAnalyzer.Analyze(_root);
+        Dictionary<string, List<string>> raw = full.raw;
+        Dictionary<string, string> magicNumbers = full.full;
+
         AnsiConsole.MarkupLine($"[bold yellow]Magic Number Detection[/]");
 
         foreach (var (name, message) in magicNumbers)
         {
             AnsiConsole.MarkupLine($"[italic blue]{name}[/]");
             AnsiConsole.MarkupLine($"{message}");
+
+            if (writer != null)
+            {
+                var value = raw[name];
+                if (value.Count > 0)
+                {
+                    writer.UpdateMagicNumbers(name, value);
+                }
+            }
+            
         }
         AnsiConsole.MarkupLine($"\n[red italic]Always[/][red] remember to use a descriptive constant instead of a magic number.[/]");
         ConsoleUI.WaitForKey();
@@ -87,18 +115,25 @@ public class Analyzer
     /// <param name="root">The root (compilation unit)</param>
     public void CheckPendingTasks()
     {
-        List<string> comments = PendingTasksAnalyzer.Analyze(_root);
+        var full = PendingTasksAnalyzer.Analyze(_root);
+        List<string> comments = full.full;
+        List<string> raw = full.raw;
+
         AnsiConsole.MarkupLine($"[bold yellow]FIXME and TODO comments[/]");
 
         if (comments.Count == 0)
         {
             AnsiConsole.MarkupLine("No TODO/FIXME-style comments found.");
+            ConsoleUI.WaitForKey();
+            return;
         }
 
         foreach (string comment in comments)
         {
             AnsiConsole.MarkupLine(comment);
         }
+
+        writer?.UpdatePendingTasks(raw);
 
         ConsoleUI.WaitForKey();
     }
@@ -110,7 +145,9 @@ public class Analyzer
     /// </summary>
     public void CheckMethodComplexity()
     {
-        List<string> lines = ComplexityAnalyzer.Analyze(_root);
+        var full = ComplexityAnalyzer.Analyze(_root);
+        List<string> lines = full.printing;
+        Dictionary<string, ComplexityAnalysis> analysis = full.analysis;
 
         AnsiConsole.MarkupLine($"[bold yellow]Method complexity[/]");
 
@@ -118,6 +155,15 @@ public class Analyzer
         {
             AnsiConsole.MarkupLine(line);
         }
+
+        if (writer != null)
+        {
+            foreach (var (name, a) in analysis)
+            {
+                writer.UpdateComplexity(name, a);
+            }
+        }
+
         ConsoleUI.WaitForKey();
     }
 
@@ -126,12 +172,16 @@ public class Analyzer
     /// </summary>
     public void ShowFileStats()
     {
-        List<string> writes = FileAnalyzer.Analyze(_root);
+        var full = FileAnalyzer.Analyze(_root);
+        List<string> writes = full.lines;
+        FileStats stats = full.fileStats;
 
         foreach (string write in writes)
         {
             AnsiConsole.MarkupLine(write);
         }
+
+        writer?.UpdateFileStats(stats);
 
         ConsoleUI.WaitForKey();
     }
@@ -147,6 +197,7 @@ public class Analyzer
         if (methodWarnings.Count == 0)
         {
             AnsiConsole.MarkupLine("[green]No dead code detected![/]");
+            ConsoleUI.WaitForKey();
             return;
         }
 
@@ -158,6 +209,8 @@ public class Analyzer
             {
                 AnsiConsole.MarkupLine($"[red]- {warning}[/]");
             }
+
+            writer?.UpdateDeadCode(method, warnings);
         }
 
         ConsoleUI.WaitForKey();
@@ -187,13 +240,15 @@ public class Analyzer
             AnsiConsole.MarkupLine($"[blue]\"{text}\"[/] is used [red]{amount}[/] times");
         }
 
+        writer?.UpdateDuplicateStrings(strings);
+
         AnsiConsole.MarkupLine("\n[yellow]Consider using constant string variables if you're using them multiple times[/]");
         ConsoleUI.WaitForKey();
     }
 
     public void CheckMethodDepth(int threshold)
     {
-        var results = NestedLoopAnalyzer.Analyze(_root, threshold);
+        var results = NestedLoopAnalyzer.Analyze(_root, 0);
 
         AnsiConsole.MarkupLine($"[bold yellow]Methods with deeply nested loops[/]");
 
@@ -205,10 +260,14 @@ public class Analyzer
 
         foreach (var (methodName, amount) in results)
         {
-            AnsiConsole.MarkupLine($"[blue]{methodName}[/] has a depth of [red]{amount}[/]");
-        }
+            if(amount < 3)
+                AnsiConsole.MarkupLine($"[blue]{methodName}[/] has a depth of [green]{amount}[/]");
+            else
+                AnsiConsole.MarkupLine($"[blue]{methodName}[/] has a depth of [red]{amount}[/], consider reconstructing");
 
-        AnsiConsole.MarkupLine("\n[yellow]Consider refactoring these methods so they aren't too deeply nested[/]");
+            writer?.UpdateDepth(methodName, amount);
+        }
+        
         ConsoleUI.WaitForKey();
     }
 
@@ -232,6 +291,8 @@ public class Analyzer
         foreach (string method in methods)
         {
             AnsiConsole.MarkupLine($"[blue]Method name [red]\"{method}\"[/] is too generic[/]");
+
+            writer?.UpdateGenericName(method);
         }
 
         AnsiConsole.MarkupLine($"\n[yellow]It's not good practice to use method names that don't explain what they're supposed to do[/]");
@@ -251,5 +312,19 @@ public class Analyzer
         var code = File.ReadAllText(filePath);
 
         return CSharpSyntaxTree.ParseText(code).GetRoot();
+    }
+
+    public static List<MethodAnalysisResult> ReturnAllMethods(SyntaxNode root)
+    {
+        List<MethodAnalysisResult> results = new();
+        IEnumerable<MethodDeclarationSyntax> methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
+
+        foreach (var method in methods)
+        {
+            MethodAnalysisResult result = new(method.Identifier.Text);
+            results.Add(result);
+        }
+
+        return results;
     }
 }

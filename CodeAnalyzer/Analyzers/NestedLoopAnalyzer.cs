@@ -16,10 +16,7 @@ public static class NestedLoopAnalyzer
             if (method.Body != null)
             {
                 int depth = AnalyzeBlock(method.Body, 0);
-                if (depth > threshold)
-                {
-                    results[method.Identifier.Text] = depth;
-                }
+                results[method.Identifier.Text] = depth;
             }
         }
 

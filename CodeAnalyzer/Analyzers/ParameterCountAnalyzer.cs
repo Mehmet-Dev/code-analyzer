@@ -29,7 +29,7 @@ public static class ParameterCountAnalzer
         if (count >= 7)
             return ("Excessive parameters; strongly reconsider redesigning the method.", "red");
         else if (count >= 5)
-            return ("High parameter count; refactoring is recommended.", "orange");
+            return ("High parameter count; refactoring is recommended.", "bold yellow");
         else if (count >= 3)
             return ("Moderate parameter count; consider simplifying if possible unless necessary.", "yellow");
         else

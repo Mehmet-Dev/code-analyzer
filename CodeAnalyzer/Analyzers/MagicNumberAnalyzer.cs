@@ -6,9 +6,10 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class MagicNumberAnalyzer
 {
-    public static Dictionary<string, string> Analyze(SyntaxNode root)
+    public static (Dictionary<string, List<string>> raw, Dictionary<string, string> full) Analyze(SyntaxNode root)
     {
         Dictionary<string, string> magicNumbers = new();
+        Dictionary<string, List<string>> raw = new(); 
         HashSet<SyntaxKind> kindsToIgnore = new()
         {
             SyntaxKind.EnumMemberDeclaration,
@@ -34,6 +35,7 @@ public static class MagicNumberAnalyzer
                             .Where(lit => lit.IsKind(SyntaxKind.NumericLiteralExpression)); // Filter out everything that isn't a literal number
 
             string message = "";
+            List<string> rawResults = new();
             foreach (LiteralExpressionSyntax numeric in numerics)
             {
                 var value = numeric.Token.Value;
@@ -63,6 +65,7 @@ public static class MagicNumberAnalyzer
                 int lineNumber = lineSpan.StartLinePosition.Line + 1;
 
                 message += $"[red]- Magic number {numeric.Token.Value} found on line {lineNumber}\n[/]";
+                rawResults.Add($"Magic number {numeric.Token.Value} found on line {lineNumber}");
                 magicNumberFound = true;
             }
 
@@ -70,9 +73,10 @@ public static class MagicNumberAnalyzer
                 message += "[green]- No magic number found[/]";
 
             magicNumbers.Add(method.Identifier.Text, message);
+            raw.Add(method.Identifier.Text, rawResults);
         }
 
-        return magicNumbers;
+        return (raw, magicNumbers);
     }
 
     /// <summary>

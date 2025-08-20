@@ -11,6 +11,7 @@ public class AnalyzerCore
     private Dictionary<string, Action<ThresholdContext>> _flags;
     private Queue<Action<ThresholdContext>> _queue = new();
     private string[] _args;
+    private bool _json = false;
 
     public AnalyzerCore(string[] args)
     {
@@ -32,29 +33,46 @@ public class AnalyzerCore
 
         if (_args.Contains("--bulk"))
         {
-            BulkAnalyzer bulk = new(_args);
+            if (_args.Contains("--json"))
+            {
+                BulkJsonAnalyzer bulk = new(_args);
+            }
+            else
+            {
+                BulkAnalyzer bulk = new(_args);
+            }
             Environment.Exit(1);
         }
 
-        foreach (string arg in _args)
-            {
-                if (arg.StartsWith("--"))
-                {
-                    runAll = false;
-                    chosenFlags.Add(arg);
-                    continue;
-                }
-                else if (arg.EndsWith(".cs"))
-                {
-                    SyntaxNode? root = CheckRoot(arg);
+        if (_args.Contains("--json"))
+        {
+            _json = true;
+        }
 
-                    if (root != null)
-                    {
-                        foundRoot = true;
+        foreach (string arg in _args)
+        {
+            if (arg == "--json")
+                continue;
+            else if (arg.StartsWith("--"))
+            {
+                runAll = false;
+                chosenFlags.Add(arg);
+                continue;
+            }
+            else if (arg.EndsWith(".cs"))
+            {
+                SyntaxNode? root = CheckRoot(arg);
+
+                if (root != null)
+                {
+                    foundRoot = true;
+                    if (_json)
+                        _analyzer = new(root, true);
+                    else
                         _analyzer = new(root);
-                    }
                 }
             }
+        }
 
         if (!foundRoot)
         {
@@ -96,13 +114,17 @@ public class AnalyzerCore
             CreateConfig();
 
         ThresholdContext context = ParseConfig();
-        
+
 
         foreach (var action in _queue)
         {
             action.Invoke(context);
             Console.Clear();
         }
+
+        if (_json)
+            _analyzer.writer.SaveToFile();
+
     }
 
     /// <summary>
@@ -203,11 +225,16 @@ public class AnalyzerCore
         AnsiConsole.MarkupLine("[bold underline green]CodeAnalyzer Help[/]\n");
 
         AnsiConsole.MarkupLine("[bold yellow]Usage:[/]");
-        AnsiConsole.MarkupLine("  [green]dotnet run -- [blue]<path-to-file.cs>[/] [purple]<flags>[/][/]");
+        AnsiConsole.MarkupLine("  [green]dotnet run -- <path-to-file-or-folder> <flags>[/]");
+        AnsiConsole.MarkupLine("  [green]dotnet run -- <path-to-file-or-folder> --json[/] - [grey](outputs JSON)[/]");
+        AnsiConsole.MarkupLine("  [green]dotnet run -- <folder-path> --bulk[/] - [grey](analyze multiple files)[/]");
+        AnsiConsole.MarkupLine("  [green]dotnet run -- <folder-path> --bulk --json[/] - [grey](analyze multiple files and output JSON)[/]");
         AnsiConsole.WriteLine();
 
         AnsiConsole.MarkupLine("[bold yellow]Example:[/]");
-        AnsiConsole.MarkupLine("  [green]dotnet run -- Sample.cs --methodLength --params --magic[/]");
+        AnsiConsole.MarkupLine("  [green]dotnet run -- Sample.cs --methodLength --magic[/]");
+        AnsiConsole.MarkupLine("  [green]dotnet run -- ./src --json[/]");
+        AnsiConsole.MarkupLine("  [green]dotnet run -- ./src --bulk --json[/]");
         AnsiConsole.WriteLine();
 
         var table = new Table()
@@ -226,13 +253,19 @@ public class AnalyzerCore
         table.AddRow("[purple]--duplicate[/]", "Warns about repeated string literals.");
         table.AddRow("[purple]--methodDepth[/]", "Flags deeply nested loops.");
         table.AddRow("[purple]--genericNames[/]", "Warns about vague method names like DoStuff.");
+        table.AddRow("[purple]--json[/]", "Outputs analysis in JSON format instead of console.");
+        table.AddRow("[purple]--bulk[/]", "Analyze all C# files in a folder (use with or without --json).");
 
         AnsiConsole.Write(table);
         AnsiConsole.WriteLine();
 
         AnsiConsole.MarkupLine("[bold yellow]Tips:[/]");
-        AnsiConsole.MarkupLine("- You can run with no flags to run all checks.");
+        AnsiConsole.MarkupLine("- Run with no flags to run all checks on a single file.");
+        AnsiConsole.MarkupLine("- Bulk mode analyzes all .cs files in the folder and its subfolders.");
+        AnsiConsole.MarkupLine("- JSON output is ideal for automated pipelines or saving results.");
+        AnsiConsole.MarkupLine("- Combine [green]--bulk[/] and [green]--json[/] for batch JSON analysis.");
         AnsiConsole.MarkupLine("- Flags can be in any order.");
         AnsiConsole.MarkupLine("- Use [green]--help[/] to view this screen again.");
     }
+
 }

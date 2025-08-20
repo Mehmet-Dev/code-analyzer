@@ -1,3 +1,4 @@
+using CodeAnalyzer.Models;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -6,9 +7,10 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class ComplexityAnalyzer
 {
-    public static List<string> Analyze(SyntaxNode root)
+    public static (Dictionary<string, ComplexityAnalysis> analysis, List<string> printing) Analyze(SyntaxNode root)
     {
         List<string> linesToPrint = new();
+        Dictionary<string, ComplexityAnalysis> raw = new();
 
         IEnumerable<MethodDeclarationSyntax> methods = root.DescendantNodes().OfType<MethodDeclarationSyntax>();
 
@@ -16,6 +18,7 @@ public static class ComplexityAnalyzer
         {
             int total = 1;
             List<string> strings = new();
+            ComplexityAnalysis a = new();
 
             // Part 1: determine amount of if statements
             int ifStatements = CalculateIfStatements(method);
@@ -25,6 +28,8 @@ public static class ComplexityAnalyzer
                 total += ifStatements;
             }
 
+            a.IfStatements = ifStatements;
+
             // Part 2: Determine for and foreach statements
             int forStatements = CalculateForAndForeach(method);
             if (forStatements > 0)
@@ -32,6 +37,8 @@ public static class ComplexityAnalyzer
                 strings.Add($"[deepskyblue1]- For and ForEach loops: {forStatements}[/]");
                 total += forStatements;
             }
+
+            a.ForStatements = forStatements;
 
             // Part 3: Determine while and do statements
             int whileAndDoStatements = CalculateWhileAndDoStatements(method);
@@ -41,6 +48,8 @@ public static class ComplexityAnalyzer
                 total += whileAndDoStatements;
             }
 
+            a.WhileAndDoStatements = whileAndDoStatements;
+
             // Part 4: Determine switch blocks
             int switchStatements = CalculateSwitchBlocks(method);
             if (switchStatements > 0)
@@ -48,6 +57,8 @@ public static class ComplexityAnalyzer
                 strings.Add($"[mediumorchid]- Switch cases: {switchStatements}[/]");
                 total += switchStatements;
             }
+
+            a.SwitchStatements = switchStatements;
 
             // Part 5: && and ||
             int logicOperators = CalculateLogicOperators(method);
@@ -57,10 +68,15 @@ public static class ComplexityAnalyzer
                 total += logicOperators;
             }
 
+            a.LogicOperators = logicOperators;
+
             string complexity = DetermineComplexity(total, method.Identifier.Text);
             linesToPrint.Add(complexity);
             foreach (string s in strings)
                 linesToPrint.Add(s);
+
+            a.TotalComplexity = total;
+            raw.Add(method.Identifier.Text, a);
         }
 
         linesToPrint.Add("\n[bold underline yellow]Complexity Level Explanation[/]");
@@ -71,7 +87,7 @@ public static class ComplexityAnalyzer
 
         linesToPrint.Add("\n[italic dim]Note:[/] [italic]High complexity isn't always bad — sometimes you're forced into it (e.g. performance constraints, legacy systems, or third-party code). Just make sure it's [bold]intentional[/], not accidental.[/]");
 
-        return linesToPrint;
+        return (raw, linesToPrint);
     }
 
     public static int CheckFileComplexity(SyntaxNode root)
