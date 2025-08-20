@@ -5,6 +5,12 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class MethodLengthAnalyzer
 {
+    /// <summary>
+    /// Determine the length of a method
+    /// This is like fairly simple and straightforward
+    /// </summary>
+    /// <param name="root">Root node to analyze</param>
+    /// <returns>A dictionary where the key is the method name and int is the length of it</returns>
     public static Dictionary<string, int> Analyze(SyntaxNode root)
     {
         Dictionary<string, int> methodLengths = new();

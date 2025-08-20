@@ -1,5 +1,8 @@
 namespace CodeAnalyzer.Models;
 
+/// <summary>
+/// Again, another model used for json output... it collects everything ya know dabadee dabadoo
+/// </summary>
 public class FileStats
 {
     public string FileName { get; set; }
@@ -11,5 +14,5 @@ public class FileStats
     public (int propertyCount, int fieldCount) FieldsAndProperties { get; set; }
     public double CommentDensity { get; set; }
 
-    public FileStats() {}
+    public FileStats() { }
 }

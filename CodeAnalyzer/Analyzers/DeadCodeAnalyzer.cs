@@ -34,6 +34,12 @@ public static class DeadCodeAnalyzer
         return methodWarnings;
     }
 
+    /// <summary>
+    /// Analyze a method body
+    /// </summary>
+    /// <param name="body">The body of the method</param>
+    /// <param name="warnings">A list where warnings can be put into</param>
+    /// <returns>Just a simple bool which isn't necessarily used</returns>
     private static bool AnalyzeBlock(BlockSyntax body, List<string> warnings)
     {
         bool terminated = false; // If terminated is set to true BEFORE the last statement, it usually indicates that there's dead code
@@ -54,20 +60,30 @@ public static class DeadCodeAnalyzer
         return terminated;
     }
 
+    /// <summary>
+    /// Analyze a statement and check if it causes termination or unreachable code
+    /// </summary>
+    /// <param name="statement">the statement to analyze</param>
+    /// <param name="warnings">list of warnings for unreachable code</param>
+    /// <returns>true if statement guarantees termination otherwise false</returns>
     private static bool AnalyzeStatement(StatementSyntax statement, List<string> warnings)
     {
         switch (statement)
         {
+            // return and throw always terminate
             case ReturnStatementSyntax:
             case ThrowStatementSyntax:
                 return true;
 
+            // break is only valid inside loops or switch
             case BreakStatementSyntax:
                 return !IsInsideValidScope(statement, allowSwitch: true);
 
+            // continue is only valid inside loops
             case ContinueStatementSyntax:
                 return !IsInsideValidScope(statement, allowSwitch: false);
 
+            // if statements need to analyze both branches
             case IfStatementSyntax ifStatement:
                 {
                     var thenTerm = AnalyzePossibleBlock(ifStatement.Statement, warnings);
@@ -76,6 +92,7 @@ public static class DeadCodeAnalyzer
                     return thenTerm && elseTerm;
                 }
 
+            // while loop body analysis
             case WhileStatementSyntax whileStatement:
                 {
                     bool loopTerminated = false;
@@ -94,9 +111,12 @@ public static class DeadCodeAnalyzer
 
                         loopTerminated = AnalyzeStatement(stmt, warnings);
                     }
-                    return false; // loops may or may not terminate here, so returning false is safer
+
+                    // loops might not always terminate so return false
+                    return false;
                 }
 
+            // for loop body analysis
             case ForStatementSyntax forStatement:
                 {
                     bool loopTerminated = false;
@@ -115,9 +135,11 @@ public static class DeadCodeAnalyzer
 
                         loopTerminated = AnalyzeStatement(stmt, warnings);
                     }
+
                     return false;
                 }
 
+            // switch statement analysis each section checked
             case SwitchStatementSyntax switchStatement:
                 {
                     bool allTerminated = true;
@@ -144,10 +166,16 @@ public static class DeadCodeAnalyzer
                 }
         }
 
+        // default case no guaranteed termination
         return false;
     }
 
-
+    /// <summary>
+    /// Check if a node is in a valid scope
+    /// </summary>
+    /// <param name="node">Node to analyze</param>
+    /// <param name="allowSwitch">Whether a switch should be allowed</param>
+    /// <returns>True when it's valid, false otherwise</returns>
     private static bool IsInsideValidScope(SyntaxNode node, bool allowSwitch)
     {
         return node.Ancestors().Any(a =>

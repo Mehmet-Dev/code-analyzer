@@ -5,10 +5,14 @@ using Spectre.Console;
 
 namespace CodeAnalyzer;
 
+/// <summary>
+/// Class used for bulk analysis
+/// </summary>
 public class BulkAnalyzer
 {
     private List<string> _flags = new();
-    private List<string> _files;
+    private List<string> _files; // Files to check
+
     public BulkAnalyzer(string[] args)
     {
         Initialize(args);
@@ -19,39 +23,39 @@ public class BulkAnalyzer
     {
         List<string> arguments = args.ToList<string>();
 
-        arguments.Remove("--bulk");
+        arguments.Remove("--bulk"); // Remove the bulk flag
 
-        List<string> paths = new();
+        List<string> paths = new(); // Used to determine whether multiple paths were provided
         foreach (var arg in arguments)
         {
             if (arg.StartsWith("--"))
-                _flags.Add(arg);
-            else
+                _flags.Add(arg); // If it's an analysis flag, add it to the _flags
+            else // Else assume it's a path
                 paths.Add(arg);
         }
 
-        if (paths.Count > 1)
+        if (paths.Count > 1) // If more than 1 path is provided throw an error and quit execution
         {
             ConsoleUI.PrintError("Error: multiple paths or broken flags have been provided.\nTry again.");
             Environment.Exit(-1);
         }
 
-        if (paths.Count == 0)
+        if (paths.Count == 0) // If no path was provided throw error and quit execution
         {
             ConsoleUI.PrintError("Error: no path was provided.\nTry again.");
             Environment.Exit(-1);
         }
 
-        if (_flags.Count == 0)
-                _flags = AllFlags();
+        if (_flags.Count == 0) // If no flags were provided assume all analysis
+            _flags = AllFlags();
 
-        if (!Directory.Exists(paths[0]))
+        if (!Directory.Exists(paths[0])) // If said path doesn't exist blow up the user's house
         {
             ConsoleUI.PrintError($"Folder '{paths[0]}' not found.");
             Environment.Exit(-1);
         }
 
-        _files = Directory.GetFiles(paths[0], "*.cs", SearchOption.AllDirectories).ToList();
+        _files = Directory.GetFiles(paths[0], "*.cs", SearchOption.AllDirectories).ToList(); // Get all the .cs files
     }
 
     private void Run()
@@ -75,7 +79,7 @@ public class BulkAnalyzer
             ["--genericNames"] = () => { CheckMethodNames(); },
         };
 
-        foreach (string flag in _flags)
+        foreach (string flag in _flags) // Execute the analysis
         {
             Console.Clear();
             if (actions.TryGetValue(flag, out var action))
@@ -89,6 +93,10 @@ public class BulkAnalyzer
             }
         }
     }
+
+    /*
+        All of the following methods are used for bulk analysis. They take the results and displays them nicely as big results
+    */
 
     private void CheckMethodLengths(int threshold)
     {
@@ -219,7 +227,7 @@ public class BulkAnalyzer
         ConsoleUI.WaitForKey();
     }
 
-    private static void Error()
+    private static void Error() // Some methods were skipped for bulk analysis as they weren't needed
     {
         ConsoleUI.PrintError("This analysis cannot be used in bulk.");
         ConsoleUI.WaitForKey();

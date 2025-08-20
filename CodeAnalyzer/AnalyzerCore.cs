@@ -7,11 +7,11 @@ namespace CodeAnalyzer;
 
 public class AnalyzerCore
 {
-    private Analyzer _analyzer;
-    private Dictionary<string, Action<ThresholdContext>> _flags;
-    private Queue<Action<ThresholdContext>> _queue = new();
-    private string[] _args;
-    private bool _json = false;
+    private Analyzer _analyzer; // Bare file analyzer
+    private Dictionary<string, Action<ThresholdContext>> _flags; // Holding the CLi flags
+    private Queue<Action<ThresholdContext>> _queue = new(); // Order of analysis execution
+    private string[] _args; // All the arguments
+    private bool _json = false; // Whether the "--json" flag is present
 
     public AnalyzerCore(string[] args)
     {
@@ -19,54 +19,57 @@ public class AnalyzerCore
         Initialize();
     }
 
+    /// <summary>
+    /// Initalize order of execution
+    /// </summary>
     private void Initialize()
     {
         bool foundRoot = false;
         bool runAll = true;
         List<string> chosenFlags = new();
 
-        if (_args.Length == 0 || _args.Contains("--help"))
+        if (_args.Length == 0 || _args.Contains("--help")) // If no flags are provided or --help is present, show instructions and quit app
         {
             PrintOutInstructions();
             Environment.Exit(1);
         }
 
-        if (_args.Contains("--bulk"))
+        if (_args.Contains("--bulk")) // If the bulk flag is present, handle things a bit differently
         {
-            if (_args.Contains("--json"))
+            if (_args.Contains("--json")) // If the json flag is present, initialize the BulkJsonAnalyzer and continue executing there
             {
                 BulkJsonAnalyzer bulk = new(_args);
             }
-            else
+            else // Else, bring out the BulkAnalyzer and continue execution there
             {
                 BulkAnalyzer bulk = new(_args);
             }
             Environment.Exit(1);
         }
 
-        if (_args.Contains("--json"))
+        if (_args.Contains("--json"))// If it only contains json flags with no bulk, set the _json flag to True
         {
             _json = true;
         }
 
-        foreach (string arg in _args)
+        foreach (string arg in _args) // Loop through every argument
         {
-            if (arg == "--json")
+            if (arg == "--json") // Skip the json flag to not put the flag into the _flags
                 continue;
-            else if (arg.StartsWith("--"))
+            else if (arg.StartsWith("--")) // If it's a flag
             {
-                runAll = false;
+                runAll = false; // Set runAll to false and add to _flags
                 chosenFlags.Add(arg);
                 continue;
             }
-            else if (arg.EndsWith(".cs"))
+            else if (arg.EndsWith(".cs")) // if it ends with .cs it's the file that needs to be analyzed
             {
-                SyntaxNode? root = CheckRoot(arg);
+                SyntaxNode? root = CheckRoot(arg); // Check whether it's a valid C# file
 
                 if (root != null)
                 {
                     foundRoot = true;
-                    if (_json)
+                    if (_json) // Set the json flag to true when initializing the analyzer
                         _analyzer = new(root, true);
                     else
                         _analyzer = new(root);
@@ -74,15 +77,15 @@ public class AnalyzerCore
             }
         }
 
-        if (!foundRoot)
+        if (!foundRoot) // If no root was found (no valid C# file) display error and quit execution
         {
             ConsoleUI.PrintError("A valid .cs file wasn't provided. Please provide a path.");
             Environment.Exit(-1);
         }
 
-        _flags = RegisterFlags();
+        _flags = RegisterFlags(); // Register all the flags
 
-        if (runAll)
+        if (runAll) // If runAll is true, insert every analysis into the queue
         {
             foreach (var (key, action) in _flags)
             {
@@ -106,23 +109,22 @@ public class AnalyzerCore
         }
     }
 
-    public void Run()
+    public void Run() // Run the analysis
     {
         Console.Clear();
 
-        if (!File.Exists("config.cfg")) // If the file doesn't exist, quickly make the file 
+        if (!File.Exists("config.cfg")) // If the threshold config doesn't exist, quickly make the file 
             CreateConfig();
 
         ThresholdContext context = ParseConfig();
 
-
-        foreach (var action in _queue)
+        foreach (var action in _queue) // Execute analysis
         {
             action.Invoke(context);
             Console.Clear();
         }
 
-        if (_json)
+        if (_json) // After everything, if the json flag is set to true, save the JSON file
             _analyzer.writer.SaveToFile();
 
     }
@@ -175,6 +177,10 @@ public class AnalyzerCore
         return null;
     }
 
+    /// <summary>
+    /// Register the flags as Actions
+    /// </summary>
+    /// <returns>A dictionary where the key is the flag and the value is the method to be executed</returns>
     private Dictionary<string, Action<ThresholdContext>> RegisterFlags()
     => new()
     {
@@ -190,7 +196,9 @@ public class AnalyzerCore
         ["--genericNames"] = _ => _analyzer.CheckMethodNames(),
     };
 
-
+    /// <summary>
+    /// Create the config file
+    /// </summary>
     public static void CreateConfig()
     {
         string[] lines = ["MethodLength=15", "MethodDepth=3"];
@@ -201,6 +209,10 @@ public class AnalyzerCore
             writer.WriteLine(line);
     }
 
+    /// <summary>
+    /// Parse the config file
+    /// </summary>
+    /// <returns></returns>
     public static ThresholdContext ParseConfig()
     {
         var lines = File.ReadAllLines("config.cfg");
@@ -219,6 +231,9 @@ public class AnalyzerCore
         return new(thresholds["MethodLength"], thresholds["MethodDepth"]);
     }
 
+    /// <summary>
+    /// Beautifully print out the instructions
+    /// </summary>
     private void PrintOutInstructions()
     {
         AnsiConsole.Clear();

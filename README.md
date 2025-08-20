@@ -39,7 +39,7 @@ C# code analyzer.
 | ✅ Threshold configuration         | Customize analyzer limits (e.g., max lines, parameter count, loop depth) via CLI or config |
 | ✅ File globbing                   | Analyze multiple files with patterns like `src/**/*.cs`                                    |
 | ✅ JSON report output              | Generate structured results (machine-readable) for CI pipelines or automation              |
-| ⬜ Markdown / HTML report          | Export readable reports for humans — great for documentation, code reviews, etc.           |
+| ✅ Documentation/commenting codes  | Adding documentation and comments to my code where I already didn't put stuff in           |
 
 
 

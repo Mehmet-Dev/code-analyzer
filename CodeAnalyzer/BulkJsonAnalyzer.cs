@@ -7,6 +7,9 @@ using Microsoft.CodeAnalysis;
 
 namespace CodeAnalyzer;
 
+/// <summary>
+/// Class used for bulk analysis and JSON output
+/// </summary>
 public class BulkJsonAnalyzer
 {
     private List<string> _flags = new();
@@ -19,6 +22,10 @@ public class BulkJsonAnalyzer
         Run();
     }
 
+    /// <summary>
+    /// Getting so tired to explain everything
+    /// </summary>
+    /// <param name="args">Array of arguments</param>
     private void Initialize(string[] args)
     {
         List<string> arguments = args.ToList();
@@ -34,13 +41,13 @@ public class BulkJsonAnalyzer
                 paths.Add(arg);
         }
 
-        if (paths.Count > 1)
+        if (paths.Count > 1) // If multiple paths were provided, quit execution
         {
             ConsoleUI.PrintError("Error: multiple paths or broken flags have been provided.\nTry again.");
             Environment.Exit(-1);
         }
 
-        if (paths.Count == 0)
+        if (paths.Count == 0) // If no path was provided blow up their house
         {
             ConsoleUI.PrintError("Error: no path was provided.\nTry again.");
             Environment.Exit(-1);
@@ -49,7 +56,7 @@ public class BulkJsonAnalyzer
         if (_flags.Count == 0)
             _flags = AllFlags();
 
-        if (!Directory.Exists(paths[0]))
+        if (!Directory.Exists(paths[0])) // If the directory doesn't exist... yada yada
         {
             ConsoleUI.PrintError($"Folder '{paths[0]} not found.");
             Environment.Exit(-1);
@@ -108,6 +115,10 @@ public class BulkJsonAnalyzer
         ConsoleUI.WaitForKey();
         Environment.Exit(0);
     }
+
+    /*
+        Same with BulkAnalyzer, these are just methods used to nicely set everything into their respected spots
+    */
 
     private void CheckMethodLengths(int threshold)
     {
@@ -187,7 +198,6 @@ public class BulkJsonAnalyzer
             }
         }
     }
-
 
     private void CheckFileStats()
     {

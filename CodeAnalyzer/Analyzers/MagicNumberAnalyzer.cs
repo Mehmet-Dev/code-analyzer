@@ -9,7 +9,7 @@ public static class MagicNumberAnalyzer
     public static (Dictionary<string, List<string>> raw, Dictionary<string, string> full) Analyze(SyntaxNode root)
     {
         Dictionary<string, string> magicNumbers = new();
-        Dictionary<string, List<string>> raw = new(); 
+        Dictionary<string, List<string>> raw = new(); // Used for JSON output
         HashSet<SyntaxKind> kindsToIgnore = new()
         {
             SyntaxKind.EnumMemberDeclaration,
@@ -36,7 +36,7 @@ public static class MagicNumberAnalyzer
 
             string message = "";
             List<string> rawResults = new();
-            foreach (LiteralExpressionSyntax numeric in numerics)
+            foreach (LiteralExpressionSyntax numeric in numerics) // Loop through every number
             {
                 var value = numeric.Token.Value;
                 if (value is int intValue)

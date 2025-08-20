@@ -246,6 +246,10 @@ public class Analyzer
         ConsoleUI.WaitForKey();
     }
 
+    /// <summary>
+    /// Check the nested depth of a file
+    /// </summary>
+    /// <param name="threshold">Threshold for results</param>
     public void CheckMethodDepth(int threshold)
     {
         var results = NestedLoopAnalyzer.Analyze(_root, 0);
@@ -260,14 +264,14 @@ public class Analyzer
 
         foreach (var (methodName, amount) in results)
         {
-            if(amount < 3)
+            if (amount < 3)
                 AnsiConsole.MarkupLine($"[blue]{methodName}[/] has a depth of [green]{amount}[/]");
             else
                 AnsiConsole.MarkupLine($"[blue]{methodName}[/] has a depth of [red]{amount}[/], consider reconstructing");
 
             writer?.UpdateDepth(methodName, amount);
         }
-        
+
         ConsoleUI.WaitForKey();
     }
 
@@ -314,6 +318,11 @@ public class Analyzer
         return CSharpSyntaxTree.ParseText(code).GetRoot();
     }
 
+    /// <summary>
+    /// Return a list of MethodAnalysisResult used for json output
+    /// </summary>
+    /// <param name="root">Node root to check</param>
+    /// <returns>A list of MethodAnalysisResults</returns>
     public static List<MethodAnalysisResult> ReturnAllMethods(SyntaxNode root)
     {
         List<MethodAnalysisResult> results = new();

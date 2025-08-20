@@ -5,6 +5,11 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class ParameterCountAnalzer
 {
+    /// <summary>
+    /// Analyze the amount of parameters a method has
+    /// </summary>
+    /// <param name="root">Node root to analyze</param>
+    /// <returns>A dictionary where the key is method name and parameter count, and the value is the message and color to print</returns>
     public static Dictionary<(string name, int count), (string message, string color)> Analyze(SyntaxNode root)
     {
         Dictionary<(string name, int count), (string message, string color)> list = new();
@@ -14,7 +19,7 @@ public static class ParameterCountAnalzer
         {
             IEnumerable<ParameterSyntax> parameters = method.ParameterList.Parameters;
 
-            int count = parameters.Count();
+            int count = parameters.Count(); // Amount of parameters
 
             var result = ParameterCountString(count);
 
@@ -24,6 +29,11 @@ public static class ParameterCountAnalzer
         return list;
     }
 
+    /// <summary>
+    /// Make a nicely formatted message
+    /// </summary>
+    /// <param name="count">Amount of parameters of a method</param>
+    /// <returns>A tuple where message is the message to print and the color is the color it needs to be outputted as using AnsiConsole</returns>
     private static (string message, string color) ParameterCountString(int count)
     {
         if (count >= 7)

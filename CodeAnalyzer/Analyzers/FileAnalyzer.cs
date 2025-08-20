@@ -11,7 +11,7 @@ public static class FileAnalyzer
     {
         SyntaxTree tree = root.SyntaxTree;
         List<string> writes = new();
-        FileStats stats = new();
+        FileStats stats = new(); // Used for JSON output
 
         // Part 1: file line count
         int fullLength = tree.GetLineSpan(root.Span).EndLinePosition.Line + 1;

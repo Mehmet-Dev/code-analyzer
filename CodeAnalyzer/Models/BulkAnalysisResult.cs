@@ -1,5 +1,8 @@
 namespace CodeAnalyzer.Models;
 
+/// <summary>
+/// Class used for bulk JSON analysis
+/// </summary>
 public class BulkAnalysisResult
 {
     public Dictionary<string, int> MethodLengths { get; set; } = new();

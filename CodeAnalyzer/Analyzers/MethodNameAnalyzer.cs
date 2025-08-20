@@ -5,10 +5,15 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class MethodNameAnalyzer
 {
+    /// <summary>
+    /// Analyzes the method names for generic naming
+    /// </summary>
+    /// <param name="root">Root node to analyze</param>
+    /// <returns>List of strings where a string is a method name</returns>
     public static List<string> Analyze(SyntaxNode root)
     {
         List<string> results = new();
-        var genericMethodNames = new List<string>
+        var genericMethodNames = new List<string> // Names that are way too generic
         {
             "DoStuff",
             "HandleIt",

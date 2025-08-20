@@ -6,6 +6,12 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class DuplicateStringAnalyzer
 {
+    /// <summary>
+    /// Analyzes the file for duplicate string literals
+    /// String literals are strings that aren't assigned to constant values
+    /// </summary>
+    /// <param name="root">Root node of file</param>
+    /// <returns>A dictionary where the key is the string literal, and int is the amount of times (when it's used 3+ times)</returns>
     public static Dictionary<string, int> Analyze(SyntaxNode root)
     {
         Dictionary<string, int> literalCounts = new();
@@ -25,8 +31,8 @@ public static class DuplicateStringAnalyzer
 
         literalCounts = literalCounts
             .Where(kvp => kvp.Value > 2)
-            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value); // Only get the ones that have more than 3 instances
-        
+            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value); // Only get the ones that have more than 2 instances
+
         return literalCounts;
     }
 }

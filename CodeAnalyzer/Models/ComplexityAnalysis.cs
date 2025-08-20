@@ -1,5 +1,8 @@
 namespace CodeAnalyzer.Models;
 
+/// <summary>
+/// A class used for JSON output again, it's jsut a nice way to collect everything
+/// </summary>
 public class ComplexityAnalysis
 {
     public int TotalComplexity { get; set; }
@@ -19,5 +22,5 @@ public class ComplexityAnalysis
         LogicOperators = logics;
     }
 
-    public ComplexityAnalysis() {}
+    public ComplexityAnalysis() { }
 }

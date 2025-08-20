@@ -6,6 +6,12 @@ namespace CodeAnalyzer.Analyzers;
 
 public static class NestedLoopAnalyzer
 {
+    /// <summary>
+    /// Analyzes a method for deeply nested loops
+    /// </summary>
+    /// <param name="root">Root node to analyze</param>
+    /// <param name="threshold">Depth threshold</param>
+    /// <returns>Dictionary where the key is the method's name and the value is the depth</returns>
     public static Dictionary<string, int> Analyze(SyntaxNode root, int threshold)
     {
         var results = new Dictionary<string, int>();
@@ -23,6 +29,12 @@ public static class NestedLoopAnalyzer
         return results;
     }
 
+    /// <summary>
+    /// Recurisvely analyze the depth of a method
+    /// </summary>
+    /// <param name="statement">Statement to analyze</param>
+    /// <param name="depth">Current depth</param>
+    /// <returns>The depth of the method as an int</returns>
     private static int AnalyzeBlock(StatementSyntax statement, int depth)
     {
         int maxDepth = depth;
