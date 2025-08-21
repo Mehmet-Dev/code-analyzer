@@ -1,68 +1,130 @@
-# code-analyzer
-C# code analyzer.
+---
 
-# 🛠️ Code Analyzer Roadmap
+# Code Analyzer
+
+A lightweight **C# code analysis tool** using Roslyn designed to help developers maintain cleaner, more maintainable codebases.
+
+This tool scans C# files for common issues such as overly complex methods, excessive parameters, magic numbers, dead code, and more. It provides both **human-readable console output** and **JSON reports** for CI/CD integration.
 
 ---
 
-### 🧱 PHASE 1: Core Features (MVP)
+## Features
 
-| ✅ Feature                     | 🔍 What it does                                               |
-|-------------------------------|---------------------------------------------------------------|
-| ✅ Method length detection     | Warn when a method exceeds N lines                           |
-| ✅ Parameter count check       | Flag methods with too many parameters (e.g., > 4)            |
-| ✅ Magic number detection      | Find numeric literals that aren’t part of constants          |
-| ✅ TODO/FIXME comment detector | Warn about unfinished code or dev notes left behind          |
-| ✅ File-wide stats             | Total lines, number of methods, longest method, etc.         |
-| ✅ Codebase restructure        | Organize files, split logic, improve naming and structure     |
-
-
----
-
-### ⚙️ PHASE 2: Intermediate Features (Smarter Analysis)
-
-| Feature                    | What it adds                                              |
-|----------------------------|-----------------------------------------------------------|
-| ✅ Complexity estimator | Count decision points (if, switch, for, while) to show complexity |
-| ✅ Dead code detector | Warn if you detect code that never runs (e.g., after a return)  |
-| ✅ Duplicate string literals | Warn about repeated string literals that should be extracted |
-| ✅ Nested loop depth warning | Flag deeply nested loops (e.g., 3+ levels)                |
-| ✅ Method name clarity check | Warn about generic names like DoStuff, HandleIt, ProcessData |
+* **Method Length Detection** – Warns when methods exceed a defined threshold.
+* **Parameter Count Check** – Flags methods with too many parameters.
+* **Magic Number Detection** – Identifies numeric literals that should be constants.
+* **TODO/FIXME Comment Finder** – Detects unfinished or temporary code.
+* **File Statistics** – Summaries including line count, comment ratio, and method count.
+* **Complexity Estimation** – Scores methods based on branching logic.
+* **Dead Code Detection** – Finds unreachable statements.
+* **Duplicate String Warnings** – Detects repeated string literals.
+* **Nested Loop Depth Check** – Flags methods with excessive nesting.
+* **Generic Method Name Check** – Warns against vague names like `DoStuff` or `HandleIt`.
+* **JSON Output Option** – Useful for automation and CI pipelines.
 
 ---
 
-### 📊 PHASE 3: Reporting + CLI Power-Ups
+## Installation
 
-| ✅ Feature                       | 💡 Description                                                                             |
-| ------------------------------- | ------------------------------------------------------------------------------------------ |
-| ✅ `--check-selection` (CLI flags) | Run only specific checks via CLI flags (e.g., `--deadcode`, `--params`, `--strings`, etc.) |
-| ✅ Threshold configuration         | Customize analyzer limits (e.g., max lines, parameter count, loop depth) via CLI or config |
-| ✅ File globbing                   | Analyze multiple files with patterns like `src/**/*.cs`                                    |
-| ✅ JSON report output              | Generate structured results (machine-readable) for CI pipelines or automation              |
-| ✅ Documentation/commenting codes  | Adding documentation and comments to my code where I already didn't put stuff in           |
+1. Clone the repository:
 
+   ```
+   git clone https://github.com/yourusername/code-analyzer.git
+   cd code-analyzer
+   ```
 
+2. Build the project:
+
+   ```
+   dotnet build
+   ```
+
+3. Move up into the CodeAnalyzer folder
+
+   ```
+   cd CodeAnalyzer
+   ```
+
+4. Run the analyzer:
+    ```
+    dotnet run -- <path-to-file.cs> <flags>
+    ```
 
 ---
 
-### 🧠 PHASE 4: Advanced Nerdy Stuff
+## Usage
 
-| Feature                   | What it does                                              |
-|---------------------------|-----------------------------------------------------------|
-| ⬜ Visual Studio Code extension | Turn your analyzer into a real analyzer by downloading an extension on VSC |
-| ⬜ Symbol analysis         | Find unused variables, fields, or methods                  |
-| ⬜ Basic type inference warnings | Detect redundant type declarations (e.g., int x = 5; vs var x = 5;) |
-| ⬜ GitHub Actions integration | Runs analyzer on PRs and shows comments or fails builds  |
-| ⬜ GUI frontend (optional) | WinForms / Avalonia / Web frontend to drag+drop .cs files for analysis |
+Example:
+
+```
+dotnet run -- Sample.cs --methodLength --params --magic
+```
+
+Available flags:
+
+* `--methodLength` – Check method size.
+* `--params` – Check parameter counts.
+* `--magic` – Detect magic numbers.
+* `--pending` – Find TODO/FIXME comments.
+* `--fileStats` – Show file statistics.
+* `--methodComplexity` – Estimate method complexity.
+* `--deadCode` – Detect unreachable code.
+* `--duplicate` – Warn about duplicate strings.
+* `--methodDepth` – Check loop nesting depth.
+* `--genericNames` – Warn about vague method names.
 
 ---
 
-### 🌱 Bonus Ideas / Easter Eggs (Fun Stuff)
+## Output Modes
 
-| Idea                          | Why it's cool                                           |
-|-------------------------------|---------------------------------------------------------|
-| ⬜ Show random coding tip after analysis | Teach users while they run it                     |
-| ⬜ “XP system” for files (give a "code health score") | Like a game: 85/100 points for clean code      |
-| ⬜ ASCII art / intro banner using Spectre.Console | Just for flair 😎                                  |
-| ⬜ Sarcastic mode             | Adds sassy or fun messages when code is bad ("Really? 8 parameters?") |
+### Standard Output
 
+By default, results are displayed in a **colorized console output**, highlighting warnings and analysis results clearly.
+
+---
+
+### JSON Output
+
+Use the `--json` flag to generate a **machine-readable JSON report**, perfect for integrating into CI/CD pipelines or other automated workflows.
+
+Example:
+
+```
+dotnet run -- Sample.cs --json
+```
+
+---
+
+### Bulk Analysis
+
+Analyze multiple files at once using the `--bulk` flag.
+
+Example:
+
+```
+dotnet run -- --bulk src/**/*.cs
+```
+
+This will scan all matching files and provide a **combined report**.
+
+---
+
+### Bulk JSON Analysis
+
+Combine `--bulk` with `--json` to produce a **comprehensive JSON report** for an entire codebase.
+
+Example:
+
+```
+dotnet run -- --bulk src/**/*.cs --json
+```
+
+This generates a structured JSON file containing results for all analyzed files.
+
+---
+
+## License
+
+MIT License – feel free to use, modify, and share.
+
+---
